@@ -16,6 +16,7 @@ export default {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
+        "input-background": "hsl(var(--input-background))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -57,6 +58,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        chart: {
+          completed: "hsl(var(--chart-completed))",
+          remaining: "hsl(var(--chart-remaining))",
+        },
+      },
+      boxShadow: {
+        card: "var(--shadow-card)",
       },
       borderRadius: {
         lg: "var(--radius)",
