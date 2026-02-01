@@ -5,21 +5,18 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
+const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 interface HabitData {
   [habitIndex: number]: {
-    [weekIndex: number]: boolean;
+    [dayIndex: number]: boolean;
   };
 }
 
 const HabitTracker = () => {
-  const [weeks, setWeeks] = useState(4);
   const [habits, setHabits] = useState(3);
   const [habitNames, setHabitNames] = useState<string[]>(["Exercise", "Read", "Meditate"]);
   const [checkedState, setCheckedState] = useState<HabitData>({});
-
-  const handleWeeksChange = (value: number) => {
-    setWeeks(Math.max(1, Math.min(12, value)));
-  };
 
   const handleHabitsChange = (value: number) => {
     const newValue = Math.max(1, Math.min(10, value));
@@ -35,27 +32,27 @@ const HabitTracker = () => {
     setHabitNames(newNames);
   };
 
-  const handleCheckChange = (habitIndex: number, weekIndex: number, checked: boolean) => {
+  const handleCheckChange = (habitIndex: number, dayIndex: number, checked: boolean) => {
     setCheckedState((prev) => ({
       ...prev,
       [habitIndex]: {
         ...prev[habitIndex],
-        [weekIndex]: checked,
+        [dayIndex]: checked,
       },
     }));
   };
 
-  const isChecked = (habitIndex: number, weekIndex: number): boolean => {
-    return checkedState[habitIndex]?.[weekIndex] || false;
+  const isChecked = (habitIndex: number, dayIndex: number): boolean => {
+    return checkedState[habitIndex]?.[dayIndex] || false;
   };
 
   const { completed, remaining, percentage } = useMemo(() => {
     let completedCount = 0;
-    const total = habits * weeks;
+    const total = habits * 7;
 
     for (let h = 0; h < habits; h++) {
-      for (let w = 0; w < weeks; w++) {
-        if (isChecked(h, w)) {
+      for (let d = 0; d < 7; d++) {
+        if (isChecked(h, d)) {
           completedCount++;
         }
       }
@@ -66,7 +63,7 @@ const HabitTracker = () => {
       remaining: total - completedCount,
       percentage: total > 0 ? Math.round((completedCount / total) * 100) : 0,
     };
-  }, [checkedState, habits, weeks]);
+  }, [checkedState, habits]);
 
   const pieData = [
     { name: "Completed", value: completed, color: "hsl(var(--chart-completed))" },
@@ -91,35 +88,19 @@ const HabitTracker = () => {
             <CardTitle className="text-lg">Configuration</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="weeks" className="text-sm font-medium">
-                  Number of Weeks
-                </Label>
-                <Input
-                  id="weeks"
-                  type="number"
-                  min={1}
-                  max={12}
-                  value={weeks}
-                  onChange={(e) => handleWeeksChange(parseInt(e.target.value) || 1)}
-                  className="bg-input-background"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="habits" className="text-sm font-medium">
-                  Number of Habits
-                </Label>
-                <Input
-                  id="habits"
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={habits}
-                  onChange={(e) => handleHabitsChange(parseInt(e.target.value) || 1)}
-                  className="bg-input-background"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="habits" className="text-sm font-medium">
+                Number of Habits
+              </Label>
+              <Input
+                id="habits"
+                type="number"
+                min={1}
+                max={10}
+                value={habits}
+                onChange={(e) => handleHabitsChange(parseInt(e.target.value) || 1)}
+                className="bg-input-background max-w-[200px]"
+              />
             </div>
           </CardContent>
         </Card>
@@ -137,12 +118,12 @@ const HabitTracker = () => {
                     <th className="p-4 text-left font-semibold text-foreground min-w-[150px]">
                       Habit
                     </th>
-                    {Array.from({ length: weeks }, (_, i) => (
+                    {DAYS_OF_WEEK.map((day) => (
                       <th
-                        key={i}
-                        className="p-4 text-center font-semibold text-foreground min-w-[80px]"
+                        key={day}
+                        className="p-4 text-center font-semibold text-foreground min-w-[60px]"
                       >
-                        Week {i + 1}
+                        {day}
                       </th>
                     ))}
                   </tr>
@@ -161,12 +142,12 @@ const HabitTracker = () => {
                           placeholder={`Habit ${habitIndex + 1}`}
                         />
                       </td>
-                      {Array.from({ length: weeks }, (_, weekIndex) => (
-                        <td key={weekIndex} className="p-4 text-center">
+                      {DAYS_OF_WEEK.map((_, dayIndex) => (
+                        <td key={dayIndex} className="p-4 text-center">
                           <Checkbox
-                            checked={isChecked(habitIndex, weekIndex)}
+                            checked={isChecked(habitIndex, dayIndex)}
                             onCheckedChange={(checked) =>
-                              handleCheckChange(habitIndex, weekIndex, checked as boolean)
+                              handleCheckChange(habitIndex, dayIndex, checked as boolean)
                             }
                             className="h-6 w-6 rounded-md border-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                           />
